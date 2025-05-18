@@ -2,7 +2,6 @@
 
 #ifndef _HID_h_
 #define _HID_h
-
 /* HID device structure */
 typedef struct {
 	BYTE addr;
