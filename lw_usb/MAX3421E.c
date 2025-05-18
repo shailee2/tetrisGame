@@ -17,7 +17,6 @@
 #include "xintc.h"
 
 /* variables and data structures */
-
 /* External variables */
 
 extern BYTE usb_task_state;
