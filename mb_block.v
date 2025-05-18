@@ -12,7 +12,6 @@ module mb_block (
     output usb_spi_sclk,
     output [0:0] usb_spi_ss
 );
-
     // Simulation keycode register
     reg [7:0] sim_keycode;
     assign gpio_usb_keycode_0_tri_o = {24'h00, sim_keycode};
