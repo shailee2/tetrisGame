@@ -34,7 +34,6 @@ module color_mapper (
 
     parameter CHAR_W = 16;
     parameter CHAR_H = 32;
-
     int gx_idx, gy_idx;
 
     always_comb begin
