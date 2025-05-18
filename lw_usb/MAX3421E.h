@@ -29,7 +29,6 @@
 
 /* SSPCON1 REGISTER */
 #define   SSPENB        0x20           // Enable serial port and configures SCK, SDO, SDI
-
 #define   SPI_FOSC_4    0              // SPI Master mode, clock = Fosc/4
 #define   SPI_FOSC_16   1              // SPI Master mode, clock = Fosc/16
 #define   SPI_FOSC_64   2              // SPI Master mode, clock = Fosc/64
