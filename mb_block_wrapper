@@ -7,6 +7,7 @@
 //Design      : mb_block_wrapper
 //Purpose     : IP block netlist
 //--------------------------------------------------------------------------------
+
 `timescale 1 ps / 1 ps
 
 module mb_block_wrapper
