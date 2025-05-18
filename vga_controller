@@ -22,7 +22,6 @@
 //      ECE Department @ UIUC                                            --
 //-------------------------------------------------------------------------
 
-
 module  vga_controller ( input        pixel_clk,        // 50 MHz clock
                                       reset,            // reset signal
                          output logic hs,               // Horizontal sync pulse.  Active low
