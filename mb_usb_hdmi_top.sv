@@ -10,7 +10,6 @@
 //    University of Illinois ECE Department                              --
 //-------------------------------------------------------------------------
 
-
 module mb_usb_hdmi_top(
     input logic Clk,
     input logic reset_rtl_0,
