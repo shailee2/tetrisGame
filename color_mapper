@@ -1,0 +1,139 @@
+typedef struct packed {
+    logic [3:0][9:0] xOffsets;
+    logic [3:0][9:0] yOffsets;
+} PieceShape;
+
+
+module color_mapper (
+    input PieceShape shape,
+    input  logic [9:0] shapeX, shapeY, DrawX, DrawY, shapeSize,
+    input  logic [0:19][19:0] board_state,
+    output logic [3:0] R, G, B
+);
+
+    logic is_active;
+    int deltaX, deltaY, pxSize;
+    int shapeBaseX, shapeBaseY;
+    assign shapeBaseX = shapeX;
+    assign shapeBaseY = shapeY;
+
+    int offset_x_local;
+    int offset_y_local;
+
+    localparam CELL = 20;
+    localparam CLIP_X1 = 200;
+    localparam CLIP_Y1 = 40;
+    localparam CLIP_X2 = 600;
+    localparam CLIP_Y2 = 420;
+
+    logic edge_top, edge_left, edge_bottom, edge_right;
+    logic [9:0] segX, segY;
+    logic block_edge_top, block_edge_left, block_edge_bottom, block_edge_right;
+    logic [4:0] drawX_idx, drawY_idx;
+    logic text_zone;
+
+    parameter CHAR_W = 16;
+    parameter CHAR_H = 32;
+
+    int gx_idx, gy_idx;
+
+    always_comb begin
+        edge_top    = (DrawY % CELL <= 2);
+        edge_left   = (DrawX % CELL <= 2);
+        edge_bottom = (DrawY % CELL >= CELL - 3);
+        edge_right  = (DrawX % CELL >= CELL - 3);
+    end
+
+    always_comb begin: shape_detector
+        is_active = 1'b0;
+        block_edge_top = 0;
+        block_edge_left = 0;
+        block_edge_bottom = 0;
+        block_edge_right = 0;
+
+        gx_idx = (DrawX - CLIP_X1) / CELL;
+        gy_idx = (DrawY - 20) / CELL;
+        if (gx_idx >= 0 && gx_idx < 20 && gy_idx >= 0 && gy_idx < 20 && board_state[gy_idx][gx_idx]) begin
+            is_active = 1'b1;
+            offset_x_local = DrawX % CELL;
+            offset_y_local = DrawY % CELL;
+
+            block_edge_top    = (offset_y_local <= 2);
+            block_edge_left   = (offset_x_local <= 2);
+            block_edge_bottom = (offset_y_local >= CELL - 3);
+            block_edge_right  = (offset_x_local >= CELL - 3);
+        end
+
+        if ((DrawX >= shapeX && DrawX < shapeX + 80) &&
+            (DrawY >= shapeY && DrawY < shapeY + 80) && !is_active) begin
+            logic [1:0] local_col = (DrawX - shapeX) / CELL;
+            logic [1:0] local_row = (DrawY - shapeY) / CELL;
+            for (int k = 0; k < 4; k++) begin
+                if (local_col == shape.xOffsets[k] && local_row == shape.yOffsets[k]) begin
+                    is_active = 1'b1;
+
+                    offset_x_local = DrawX - (shapeX + (shape.xOffsets[k] * CELL));
+                    offset_y_local = DrawY - (shapeY + (shape.yOffsets[k] * CELL));
+
+                    block_edge_top    = (offset_y_local <= 2);
+                    block_edge_left   = (offset_x_local <= 2);
+                    block_edge_bottom = (offset_y_local >= CELL - 3);
+                    block_edge_right  = (offset_x_local >= CELL - 3);
+                end
+            end
+        end
+    end
+
+    logic is_game_over;
+    assign is_game_over = 1'b0;
+
+    always_comb begin: color_logic
+        if (is_game_over) begin
+            if (text_zone) begin
+                R = 4'hF;
+                G = 4'h0;
+                B = 4'h0;
+            end else begin
+                R = 4'h0;
+                G = 4'h0;
+                B = 4'h0;
+            end
+        end else if (DrawX < CLIP_X1 || DrawX > CLIP_X2 || DrawY > CLIP_Y2) begin
+            R = 4'h0;
+            G = 4'h0;
+            B = 4'h0;
+        end else if (is_active) begin
+            if (block_edge_top || block_edge_left) begin
+                R = 4'hF;
+                G = 4'hA;
+                B = 4'h4;
+            end else if (block_edge_bottom || block_edge_right) begin
+                R = 4'h8;
+                G = 4'h4;
+                B = 4'h0;
+            end else begin
+                R = 4'hC;
+                G = 4'h6;
+                B = 4'h1;
+            end
+        end else if (DrawY < CLIP_Y1) begin
+            R = 4'h0;
+            G = 4'h0;
+            B = 4'h0;
+        end else if (edge_top || edge_left) begin
+            R = 4'h3;
+            G = 4'h3;
+            B = 4'h3;
+        end else if (edge_bottom || edge_right) begin
+            R = 4'h5;
+            G = 4'h5;
+            B = 4'h5;
+        end else begin
+            R = 4'h0;
+            G = 4'h0;
+            B = 4'h0;
+        end
+    end
+
+endmodule
+
