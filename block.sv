@@ -22,7 +22,6 @@ module game_logic
     } Tetromino;
 
     logic is_game_over;
-
     Tetromino tetromino_set[7];
 
     initial begin
